@@ -84,22 +84,31 @@ function downloadSingleTrackMidi(trackName, midiEvents, fileName, bpm) {
     const track = new MidiWriter.Track();
     track.setTempo(bpm);
 
-    // --- NUOVA LOGICA SEMPLIFICATA ---
-
-    // 1. Il nome della traccia ora include il titolo della canzone
     const fullTrackName = `${trackName} for ${currentMidiData.title}`;
     track.addTrackName(fullTrackName);
 
-    // 2. Scegli il canale: 10 per percussioni, 1 per tutto il resto.
     let targetChannel = 1;
     if (trackName === 'Drums' || trackName === 'Percussion') {
         targetChannel = 10;
     }
 
-    // 3. RIMUOVE TUTTI I PROGRAM CHANGE. L'utente assegnerà gli strumenti nella DAW.
-    // Questo è il fix cruciale per eliminare la traccia vuota sul canale 1.
+    // Aggiunta metadati per la traccia PAD
+    if (trackName === 'Pad' && currentMidiData && currentMidiData.sections) {
+        currentMidiData.sections.forEach(section => {
+            // Aggiunge un marker per l'inizio della sezione
+            track.addEvent(new MidiWriter.MarkerEvent({text: section.name, startTick: section.startTick}));
 
-    // 4. Aggiunge gli eventi delle note, assicurandosi che il canale sia corretto
+            if (section.mainChordSlots) {
+                section.mainChordSlots.forEach(slot => {
+                    // Aggiunge un text event per il nome dell'accordo
+                    const chordName = slot.chordName || 'N/A';
+                    const eventStartTick = section.startTick + slot.effectiveStartTickInSection;
+                    track.addEvent(new MidiWriter.TextEvent({text: chordName, startTick: eventStartTick}));
+                });
+            }
+        });
+    }
+
     midiEvents.forEach(event => {
         if (!event || typeof event.pitch === 'undefined' || !event.duration || typeof event.startTick === 'undefined') return;
 
@@ -108,7 +117,7 @@ function downloadSingleTrackMidi(trackName, midiEvents, fileName, bpm) {
             duration: typeof event.duration === 'string' ? event.duration : `T${Math.round(event.duration)}`,
             startTick: Math.round(event.startTick),
             velocity: event.velocity || 80,
-            channel: targetChannel // Usa il canale semplice che abbiamo appena deciso
+            channel: targetChannel
         };
 
         if (noteEventArgs.pitch.length > 0) {
