@@ -94,16 +94,19 @@ function downloadSingleTrackMidi(trackName, midiEvents, fileName, bpm) {
 
     // Aggiunta metadati per la traccia PAD
     if (trackName === 'Pad' && currentMidiData && currentMidiData.sections) {
+        let lastTick = 0;
         currentMidiData.sections.forEach(section => {
             // Aggiunge un marker per l'inizio della sezione
-            track.addEvent(new MidiWriter.MarkerEvent({text: section.name, startTick: section.startTick}));
+            track.addEvent(new MidiWriter.MarkerEvent({text: section.name, delta: section.startTick - lastTick}));
+            lastTick = section.startTick;
 
             if (section.mainChordSlots) {
                 section.mainChordSlots.forEach(slot => {
                     // Aggiunge un text event per il nome dell'accordo
                     const chordName = slot.chordName || 'N/A';
                     const eventStartTick = section.startTick + slot.effectiveStartTickInSection;
-                    track.addEvent(new MidiWriter.TextEvent({text: chordName, startTick: eventStartTick}));
+                    track.addEvent(new MidiWriter.TextEvent({text: chordName, delta: eventStartTick - lastTick}));
+                    lastTick = eventStartTick;
                 });
             }
         });
