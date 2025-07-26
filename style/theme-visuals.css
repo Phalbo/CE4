@@ -1,0 +1,116 @@
+/* File: theme-visuals.css */
+/* Stili prettamente estetici, animazioni, ombre dettagliate. */
+
+:root {
+  /* Ombre (definite qui per centralizzazione, ma usate in components.css) */
+  --box-shadow-sm: 0 3px 6px rgba(0,0,0,0.25);
+  --box-shadow-md: 0 6px 12px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+  --box-shadow-lg: 0 10px 20px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.25);
+  --box-shadow-accent: 0 0 15px var(--accent-primary-focus-shadow);
+
+  /* Angolo per lo sfondo animato */
+  --bg-angle: 0deg;
+}
+
+/* === SFONDO ANIMATO === */
+body::before {
+    content:"";
+    position:fixed;
+    inset: -60% -60% -30% -60%; /* Estendi oltre i bordi per effetto morbido */
+    z-index:var(--z-background); /* Dietro tutto */
+    background:
+        conic-gradient(
+            from var(--bg-angle) at 50% 50%,
+            var(--accent-primary) 0%,
+            var(--accent-secondary) 25%,
+            #5E2AB2 50%, /* Un terzo colore per più varietà */
+            var(--accent-secondary) 75%,
+            var(--accent-primary) 100%
+        );
+    opacity: 0.15; /* Molto tenue */
+    filter:blur(100px); /* Molto sfocato */
+    animation:spinBg 30s linear infinite;
+    transform-origin: 50% 50%;
+}
+
+@keyframes spinBg{
+  to {
+    --bg-angle:360deg;
+  }
+}
+
+/* Fallback per browser che non supportano animazione di custom properties */
+@supports not (animation-timing-function: linear(var(--bg-angle))) {
+    body::before{
+        animation:spinBgLegacy 30s linear infinite;
+    }
+    @keyframes spinBgLegacy{
+        from{ transform:rotate(0deg); }
+        to { transform:rotate(360deg); }
+    }
+}
+
+/* === LOGO HEADER === */
+#appLogo {
+  height: 170px; /* Altezza originale */
+  width: auto;
+  margin-bottom: var(--space-md);
+}
+
+/* Adattamenti logo per schermi più piccoli */
+@media(max-width:1024px) {
+  #appLogo { height: 160px; margin-bottom:var(--space-sm); }
+}
+@media(max-width:767px){
+  #appLogo { height: 120px; }
+}
+
+/* === TESTO "Loading..." NEL GLOSSARIO === */
+.loading-text { /* Usato in app-ui-render.js per il placeholder del glossario */
+    color: var(--text-muted);
+    font-style: italic;
+    padding: var(--space-lg) 0; /* Spazio per il testo di caricamento */
+    text-align: center; /* Centra il testo "Loading..." */
+}
+
+/* === Stili specifici per i diagrammi SVG (colori interni) === */
+/* Questi potrebbero essere definiti qui o in components.css vicino ai loro contenitori */
+/* Colori per diagramma chitarra */
+:root {
+    --diagram-fret-color: #4F586B; /* Colore delle linee dei tasti */
+    --diagram-string-color: #788094; /* Colore delle linee delle corde */
+    --diagram-dot-color: var(--text-primary); /* Colore dei pallini sui tasti */
+    --diagram-finger-color: var(--bg-primary); /* Colore del testo del numero del dito */
+    --diagram-open-color: var(--text-secondary); /* Colore per indicare corda a vuoto */
+    --diagram-muted-color: var(--text-muted); /* Colore per la 'x' di corda muta */
+
+    --btn-countermelody-bg: #4a90e2;
+    --btn-countermelody-hover-bg: #5aa1f2;
+    --btn-texture-bg: #50e3c2;
+    --btn-texture-hover-bg: #61f3d2;
+    --btn-ornament-bg: #bd10e0;
+    --btn-ornament-hover-bg: #cd21f0;
+    --btn-miasmatic-bg: #9013fe;
+    --btn-miasmatic-hover-bg: #a024fe;
+    --btn-drones-bg: #f5a623;
+    --btn-drones-hover-bg: #f6b734;
+    --btn-percussion-bg: #f8e71c;
+    --btn-percussion-hover-bg: #f9f82d;
+    --btn-glitch-bg: #d0021b;
+    --btn-glitch-hover-bg: #e0132c;
+}
+.chord-diagram-svg.guitar text { /* Stile base per testo dentro SVG chitarra */
+    font-family: var(--font-primary);
+}
+
+/* Colori per diagramma piano */
+:root {
+    --piano-white-key-color: #EAEBF0;
+    --piano-black-key-color: #1A1D24;
+    --piano-key-border-color: #0D0F12;
+    --piano-pressed-key-color: var(--accent-primary); /* Colore per tasti premuti */
+}
+.chord-diagram-svg.piano rect[fill*="rgba"] { /* Per i tasti premuti con opacità */
+    stroke-width: 1.5px;
+    stroke: var(--accent-primary-hover);
+}
