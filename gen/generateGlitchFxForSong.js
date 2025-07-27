@@ -1,6 +1,6 @@
+// gen/generateGlitchFxForSong.js
 import { Logger } from '../lib/logger.js';
 import { getChordRootAndType } from '../lib/music-theory-utils.js';
-// gen/generateGlitchFxForSong.js
 const GLITCH_EFFECTS = {
     stutter: (pitch, startTick) => {
         const events = [];
