@@ -1,3 +1,4 @@
+import { Logger } from '../lib/logger.js';
 // File: gen/generateDrumTrackForSong.js
 // CapricEngine - Drum Track Generator
 // Versione corretta per preservare le funzioni 'apply' durante il cloning del pattern,
@@ -28,8 +29,9 @@ function generateDrumTrackForSong(
     options = {},
     sectionCache
 ) {
+    Logger.info('DrumTrack', 'Generazione avviata...');
     if (!songMidiData || !songMidiData.sections || songMidiData.sections.length === 0) {
-        console.error("generateDrumTrackForSong: songMidiData.sections è mancante o vuoto.");
+        Logger.error("DrumTrack", "songMidiData.sections è mancante o vuoto.");
         throw new Error("generateDrumTrackForSong: songMidiData.sections è mancante o vuoto.");
     }
 
@@ -138,7 +140,7 @@ function generateDrumTrackForSong(
             }
             if (!sectionBasePatternForSection) sectionBasePatternForSection = compatiblePatterns[0];
         } else {
-            console.warn(`Nessun pattern di batteria specifico per ${sectionTimeSignature[0]}/${sectionTimeSignature[1]} per la sezione ${section.name}. Uso un pattern 4/4 di fallback.`);
+            Logger.warning('DrumTrack', `Nessun pattern di batteria specifico per ${sectionTimeSignature[0]}/${sectionTimeSignature[1]} per la sezione ${section.name}. Uso un pattern 4/4 di fallback.`);
             sectionBasePatternForSection = patternPool.find(p => p.name === "BasicRock44" && p.timeSignature[0]===4 && p.timeSignature[1]===4) || patternPool.find(p=>p.timeSignature[0]===4 && p.timeSignature[1]===4) || patternPool[0];
         }
 
@@ -367,6 +369,6 @@ function generateDrumTrackForSong(
             lastEventAtTickByPitch[pitchKey] = event.startTick + numericDuration;
         }
     });
-
+    Logger.success('DrumTrack', 'Generazione completata con successo.');
     return finalEvents;
 }

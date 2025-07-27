@@ -1,7 +1,10 @@
+import { Logger } from '../lib/logger.js';
+import { getChordRootAndType } from '../lib/music-theory-utils.js';
 // gen/generateTextureForSong.js
 function generateTextureForSong(songData, helpers, sectionCache) {
+    Logger.info('Texture', 'Generazione avviata...');
     const track = [];
-    const { getChordNotes, NOTE_NAMES, normalizeSectionName, getChordRootAndType } = helpers;
+    const { getChordNotes, NOTE_NAMES, normalizeSectionName } = helpers;
 
     if (!sectionCache.texture) {
         sectionCache.texture = {};
@@ -50,6 +53,7 @@ function generateTextureForSong(songData, helpers, sectionCache) {
                 const rootNote = getChordRootAndType(slot.chordName).root;
                 const rootPitch = NOTE_NAMES.indexOf(rootNote) + 60;
                 pitches = [rootPitch, rootPitch + 7, rootPitch + 12]; // Root, fifth, octave
+                Logger.warning('Texture', `Fallback per ${slot.chordName}: usando root, quinta e ottava.`);
             }
 
             sectionTrack.push({
@@ -65,5 +69,6 @@ function generateTextureForSong(songData, helpers, sectionCache) {
             track.push({ ...event, startTick: event.startTick + section.startTick });
         });
     });
+    Logger.success('Texture', 'Generazione completata con successo.');
     return track;
 }

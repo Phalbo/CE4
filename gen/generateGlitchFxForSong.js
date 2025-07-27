@@ -1,3 +1,5 @@
+import { Logger } from '../lib/logger.js';
+import { getChordRootAndType } from '../lib/music-theory-utils.js';
 // gen/generateGlitchFxForSong.js
 const GLITCH_EFFECTS = {
     stutter: (pitch, startTick) => {
@@ -29,6 +31,7 @@ const GLITCH_EFFECTS = {
 };
 
 function generateGlitchFxForSong(songData, helpers, sectionCache) {
+    Logger.info('GlitchFX', 'Generazione avviata...');
     const track = [];
     const { getChordNotes, NOTE_NAMES, getRandomElement, normalizeSectionName } = helpers;
     const ticksPerMeasure44 = 128 * 4;
@@ -49,7 +52,10 @@ function generateGlitchFxForSong(songData, helpers, sectionCache) {
 
         const sectionTrack = [];
         const scaleNotes = section.scaleNotes;
-        if (!scaleNotes || scaleNotes.length === 0) return;
+        if (!scaleNotes || scaleNotes.length === 0) {
+            Logger.warning('GlitchFX', `Skipping section ${section.name}: No scale notes found.`);
+            return;
+        }
 
         let totalTicks = 0;
         for (let m = 0; m < section.measures; m++) {
@@ -74,5 +80,6 @@ function generateGlitchFxForSong(songData, helpers, sectionCache) {
             track.push({ ...event, startTick: event.startTick + section.startTick });
         });
     });
+    Logger.success('GlitchFX', 'Generazione completata con successo.');
     return track;
 }
