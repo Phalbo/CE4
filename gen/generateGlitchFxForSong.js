@@ -32,9 +32,6 @@ function generateGlitchFxForSong(songData, helpers, sectionCache) {
     const track = [];
     const { getChordNotes, NOTE_NAMES, getRandomElement, normalizeSectionName } = helpers;
     const ticksPerMeasure44 = 128 * 4;
-    const scaleNotes = songData.mainScaleNotes;
-
-    if (!scaleNotes || scaleNotes.length === 0) return [];
 
     if (!sectionCache.glitch) {
         sectionCache.glitch = {};
@@ -51,13 +48,22 @@ function generateGlitchFxForSong(songData, helpers, sectionCache) {
         }
 
         const sectionTrack = [];
+        const scaleNotes = section.scaleNotes;
+        if (!scaleNotes || scaleNotes.length === 0) return;
+
         let totalTicks = 0;
         for (let m = 0; m < section.measures; m++) {
             if (Math.random() < 0.25) {
                 const effectName = getRandomElement(Object.keys(GLITCH_EFFECTS));
                 const randomNoteName = getRandomElement(scaleNotes);
                 const pitch = NOTE_NAMES.indexOf(randomNoteName) + 60;
-                const effectEvents = GLITCH_EFFECTS[effectName](pitch, totalTicks);
+
+                // Quantize to the nearest 16th or 32nd note
+                const quantizationGrid = [32, 64]; // Ticks for 16th and 32nd notes
+                const grid = getRandomElement(quantizationGrid);
+                const quantizedTick = Math.round(totalTicks / grid) * grid;
+
+                const effectEvents = GLITCH_EFFECTS[effectName](pitch, quantizedTick);
                 sectionTrack.push(...effectEvents);
             }
             totalTicks += ticksPerMeasure44;

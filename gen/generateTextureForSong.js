@@ -1,7 +1,7 @@
 // gen/generateTextureForSong.js
 function generateTextureForSong(songData, helpers, sectionCache) {
     const track = [];
-    const { getChordNotes, NOTE_NAMES, normalizeSectionName } = helpers;
+    const { getChordNotes, NOTE_NAMES, normalizeSectionName, getChordRootAndType } = helpers;
 
     if (!sectionCache.texture) {
         sectionCache.texture = {};
@@ -19,28 +19,38 @@ function generateTextureForSong(songData, helpers, sectionCache) {
 
         const sectionTrack = [];
         section.mainChordSlots.forEach(slot => {
-            const chordNotesResult = getChordNotes(slot.chordName);
-            let chordNotes = chordNotesResult ? chordNotesResult.notes : [];
-            if (!chordNotes || chordNotes.length === 0) {
-                console.warn(`Skipping slot for ${slot.chordName}: No chord notes found.`);
-                return;
-            }
-            if (chordNotes.length < 3) return;
+            let pitches = [];
+            let attempts = 0;
+            const maxAttempts = 10;
 
-            // Apply inversion
-            const inversion = Math.floor(Math.random() * 3); // 0: root, 1: 1st inv, 2: 2nd inv
-            if (inversion === 1) {
-                chordNotes = [chordNotes[1], chordNotes[2], chordNotes[0]];
-            } else if (inversion === 2) {
-                chordNotes = [chordNotes[2], chordNotes[0], chordNotes[1]];
+            while (pitches.length < 3 && attempts < maxAttempts) {
+                const octave = Math.floor(Math.random() * 2); // 0 or 1 for 2-octave range
+                const chordNotesResult = getChordNotes(slot.chordName);
+                let chordNotes = chordNotesResult ? chordNotesResult.notes : [];
+
+                if (chordNotes && chordNotes.length >= 3) {
+                    const inversion = Math.floor(Math.random() * 3);
+                    if (inversion === 1) {
+                        chordNotes = [chordNotes[1], chordNotes[2], chordNotes[0]];
+                    } else if (inversion === 2) {
+                        chordNotes = [chordNotes[2], chordNotes[0], chordNotes[1]];
+                    }
+
+                    pitches = chordNotes.map((n, i) => {
+                        let pitch = NOTE_NAMES.indexOf(n) + 60 + (octave * 12);
+                        if (inversion === 1 && i > 0) pitch += 12;
+                        if (inversion === 2 && i > 1) pitch += 12;
+                        return pitch;
+                    });
+                }
+                attempts++;
             }
 
-            const pitches = chordNotes.map((n, i) => {
-                let pitch = NOTE_NAMES.indexOf(n) + 60;
-                if(inversion === 1 && i > 0) pitch += 12;
-                if(inversion === 2 && i > 1) pitch += 12;
-                return pitch;
-            });
+            if (pitches.length < 3) {
+                const rootNote = getChordRootAndType(slot.chordName).root;
+                const rootPitch = NOTE_NAMES.indexOf(rootNote) + 60;
+                pitches = [rootPitch, rootPitch + 7, rootPitch + 12]; // Root, fifth, octave
+            }
 
             sectionTrack.push({
                 pitch: pitches,
