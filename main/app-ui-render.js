@@ -31,10 +31,12 @@ function updateChordEntryDisplay(fundamentalChordName) {
     if (typeof chordData.currentShapeIndex !== 'number' ||
         chordData.currentShapeIndex < 0 ||
         chordData.currentShapeIndex >= chordData.shapes.length) {
-        chordData.currentShapeIndex = Math.floor(Math.random() * chordData.shapes.length);
+        chordData.currentShapeIndex = 0;
     }
 
-    const currentShape = chordData.shapes[chordData.currentShapeIndex];
+    const randomIndex = Math.floor(Math.random() * chordData.shapes.length);
+    const currentShape = chordData.shapes[randomIndex];
+    chordData.currentShapeIndex = randomIndex;
 
     if (guitarDiagramDiv && currentShape && typeof renderGuitarDiagram === 'function') {
         guitarDiagramDiv.innerHTML = renderGuitarDiagram(currentShape.guitarFrets);
