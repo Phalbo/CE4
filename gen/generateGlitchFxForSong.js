@@ -50,7 +50,7 @@ function generateGlitchFxForSong(songData, helpers, sectionCache) {
         const sectionTrack = [];
         const scaleNotes = section.scaleNotes;
         if (!scaleNotes || scaleNotes.length === 0) {
-            console.warn(`Skipping section ${section.name}: No scale notes found.`);
+            console.error(`GlitchFX: No scale notes found for section ${section.name}.`);
             return;
         }
 
