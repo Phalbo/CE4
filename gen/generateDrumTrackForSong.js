@@ -1,9 +1,9 @@
 // File: gen/generateDrumTrackForSong.js
+import { Logger } from '../lib/logger.js';
 // CapricEngine - Drum Track Generator
 // Versione corretta per preservare le funzioni 'apply' durante il cloning del pattern,
 // utilizzare TICKS_PER_QUARTER_NOTE_REFERENCE globale, e con log di debug migliorati.
 
-import { Logger } from '../lib/logger.js';
 
 if (typeof require !== 'undefined') {
     require('../lib/config-music-data.js');
