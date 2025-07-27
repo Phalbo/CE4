@@ -31,7 +31,7 @@ function updateChordEntryDisplay(fundamentalChordName) {
     if (typeof chordData.currentShapeIndex !== 'number' ||
         chordData.currentShapeIndex < 0 ||
         chordData.currentShapeIndex >= chordData.shapes.length) {
-        chordData.currentShapeIndex = 0;
+        chordData.currentShapeIndex = Math.floor(Math.random() * chordData.shapes.length);
     }
 
     const currentShape = chordData.shapes[chordData.currentShapeIndex];
