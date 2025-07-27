@@ -1,6 +1,6 @@
-// gen/generateTextureForSong.js
 import { Logger } from '../lib/logger.js';
 import { getChordRootAndType } from '../lib/music-theory-utils.js';
+// gen/generateTextureForSong.js
 function generateTextureForSong(songData, helpers, sectionCache) {
     Logger.info('Texture', 'Generazione avviata...');
     const track = [];
