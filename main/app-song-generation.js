@@ -373,6 +373,8 @@ async function generateSongArchitecture() {
 
             rawMidiSectionsData.push({
                 name: sectionNameString,
+                key: selectedKey.root,
+                scale: selectedKey.mode,
                 baseChords: baseChordProgressionForSection,
                 measures: finalMeasures,
                 timeSignature: [...activeTimeSignatureForSectionLogic],
@@ -467,6 +469,15 @@ async function generateSongArchitecture() {
         }
         currentMidiData.mainScaleNotes = mainScaleParsedNotes;
         currentMidiData.mainScaleRoot = mainScaleParsedRoot;
+
+        rawMidiSectionsData.forEach(section => {
+            if (section.key && section.scale) {
+                const scaleNotes = getNotesInScale(section.key, section.scale);
+                section.scaleNotes = scaleNotes;
+            } else {
+                section.scaleNotes = [];
+            }
+        });
 
         if (typeof renderSongOutput === "function") {
             renderSongOutput(currentMidiData, allGeneratedChordsSet, styleNote, mainScaleText, mainScaleParsedNotes, mainScaleParsedRoot, mainScaleParsedName);
